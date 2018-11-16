@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List all books page</title>
+</head>
+<body>
+<h1>Books</h1>
+
+{% for item in bookss %}
+    <ul>
+        <li>ID {{item.id}}
+            <ul>
+                <li> The author: {{item.author}}</li>
+                <li> The title: {{item.title}}</li>
+                <li> The year: {{item.year}}</li>
+                <li> Likes : {{item.likes}}</li>
+            </ul>
+        </li>
+    </ul>
+{% endfor %}
+
+</body>
+</html>
