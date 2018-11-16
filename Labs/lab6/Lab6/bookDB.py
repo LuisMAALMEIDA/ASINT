@@ -54,6 +54,17 @@ class bookDB:
                                 ret_value.append( b)
                 return ret_value
 
+        # retorna um vetor de livros de um certo author num dado ano
+        def booksbyauthorinyear(self, author, year):
+                ret_value = []
+                for b in self.bib.values():
+                        if b.year == year:
+                                if b.author== author:
+                                        ret_value.append(b)
+                return ret_value
+
+                
+
         def likeBook(self, id):
                 for b in self.bib.values():
                         if b.id == id:

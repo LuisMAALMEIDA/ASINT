@@ -95,16 +95,51 @@ def API_add_Book():
     db.addBook(author, title, year)
     return str(200)
 
+
 @app.route('/API/listBooksAuthor', methods=['POST'])
 def API_listBooksAuthor():
     
     content = request.json
     author = content['Author']
-    title = content['Title']
+    books = db.listBooksAuthor(author)
+    nl = list(map(lambda x: x.toDict(), books) )
+    return jsonify(str(nl))
+
+
+@app.route('/API/showbook', methods=['POST'])
+def API_showbook():
+    
+    content = request.json
+    book_id = content['BookID']
+    book = db.showBook(book_id)
+    nl = book.toDict() 
+
+    return jsonify(str(nl))
+
+
+#Lista todos os livros de um certo ano
+@app.route('/API/listBooksYear', methods=['POST'])
+def API_listBooksYear():
+    
+    content = request.json
     year = content['Year']
-    db.addBook(author, title, year)
-    return str(200)
-        
+    books= db.listBooksYear(year)
+    nl = list(map(lambda x: x.toDict(), books) )
+
+    return jsonify(str(nl))
+
+#Lista todos os livros de um certo ano
+@app.route('/API/booksbyauthorinyear', methods=['POST'])
+def API_booksbyauthorinyear():
+    
+    content = request.json
+    author = content['Author']
+    year = content['Year']
+    books= db.booksbyauthorinyear(author, year)
+    print(books)
+    nl = list(map(lambda x: x.toDict(), books) )
+
+    return jsonify(str(nl))       
 
 ######### cenas dos likes
 

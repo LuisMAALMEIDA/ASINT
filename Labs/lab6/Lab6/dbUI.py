@@ -9,7 +9,7 @@ class dbUI:
 	
                 exit = False
                 while not exit:
-                        l = input("add show listall listauthor listyear quit?")
+                        l = input("add show listall listauthor listyear booksbyauthorcertainyear quit?")
                         l = l.split()
                 
                         if len(l)==1:
@@ -41,6 +41,13 @@ class dbUI:
                                                 b_list = self.db.listBooksAuthor(processed_line[0])
                                                 for b in b_list:
                                                         print(b)
+                                elif command == 'BOOKSBYAUTHORCERTAINYEAR':
+                                        l = input('Insert author and year separated by # :\n')
+                                        processed_line = l.split('#')
+                                        if len(processed_line) ==2:
+                                                b_list = self.db.booksbyauthorinyear(processed_line[0] , int(processed_line[1]))
+                                        for b in b_list:
+                                               print(b)
                                 elif command == 'LISTYEAR':
                                         l = input('Insert year :\n')
                                         processed_line = l.split()
