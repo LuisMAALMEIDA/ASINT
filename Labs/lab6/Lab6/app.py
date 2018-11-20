@@ -2,6 +2,7 @@ from flask import Flask
 from flask import render_template
 from flask import request
 from flask import jsonify
+from flask import redirect
 import bookDB
 
 app = Flask(__name__)
@@ -46,10 +47,10 @@ def show_Book_Form():
     return render_template("showBookTemplate.html" )
 
 @app.route('/showBook', methods=['GET'])
-def show_Book():
+def show_Book(id):
     if request.method == "GET":
         id =request.args.get('id')
-        book = db.showBook(int(id))
+    book = db.showBook(int(id))
 
     return render_template("showBook.html" ,book= book)
 
@@ -146,7 +147,8 @@ def API_booksbyauthorinyear():
 @app.route('/API/Books/<id>/likes', methods=['POST'])
 def f_like(id):
 
-    nl=db.likeBook(id)
+    nlikes=db.likeBook(id)
+    book= db.showBook(id)
     return jsonify({"likes": nl})
 
 

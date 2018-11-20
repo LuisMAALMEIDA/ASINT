@@ -68,6 +68,7 @@ class bookDB:
         def likeBook(self, id):
                 for b in self.bib.values():
                         if b.id == id:
+                                b.likes =+1 
                                 return b.likes
                         
                 return 2
