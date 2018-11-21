@@ -39,37 +39,7 @@
        //<![CDATA[
     $( document ).ready(function() {
 
-        $("#searchText").autocomplete();
-        $("#searchText").keyup(
-            function(event){
-                $.ajax({
-                    type: "POST",
-                    url: "/autocomplete",
-                    datatype: "json",
-                    contentType: "application/json",
-                    data: '{"str":"' + $("#searchText").val() + '"}',
-                    success: function (data) {
-                        $("#searchText").autocomplete({
-                            source: data
-                        });
-                        console.log(data);
-                        s = "<ol>";
-                        for (var i = 0, len = data.length; i < len; i++) {
-                            s += "<li>";
-                            s += data[i];
-                            s += "</li>";
-                        }
-                        s += "</ol>";
-                        $("#divDestiny").html(s);
-                    }
-                })
-
-
-            }
-
-        )
-
-
+        
 
         $( "#ButtonClick" ).click(function( event ) {
             console.log("click");
@@ -91,10 +61,10 @@
         //]]>
 </script>
 
-   <h1>Input a search term</h1>
+   <h1>Input a book id</h1>
 
 
-        <input type="text" name="" size="20" id="searchText" />
+        <input type="text" name="" size="20" id="searchText" /> 
         <input type="submit" value="Search"  id="ButtonClick"/>
 
     <div id="divDestiny">(this is where the text will go)</div>

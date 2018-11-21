@@ -5,7 +5,26 @@ from flask import jsonify
 from flask import redirect
 import bookDB
 
+class Storage:
+    def __init__ (self):
+        self.data = {}
+    def getSize(self):
+        return len(self.data)
+    def store(self, val):
+        try:
+            self.data[val] +=1
+        except:
+            self.data[val] = 1
+    def getKeys(self):
+        return self.data.keys()
+    def getValue(self, key):
+        try:
+            return self.data[key]
+        except:
+            return None
+
 app = Flask(__name__)
+st = Storage()
 db = bookDB.bookDB("mylib")
 
 @app.route('/')
@@ -44,12 +63,13 @@ def listAllBooka():
 
 @app.route('/showBookForm')
 def show_Book_Form():
-    return render_template("showBookTemplate.html" )
+    return redirect("static/showBookTemplate.xhtml" )
 
 @app.route('/showBook', methods=['GET'])
-def show_Book(id):
+def show_Book():
     if request.method == "GET":
-        id =request.args.get('id')
+       id =request.args.get('id')
+
     book = db.showBook(int(id))
 
     return render_template("showBook.html" ,book= book)
