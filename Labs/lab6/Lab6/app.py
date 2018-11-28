@@ -63,12 +63,13 @@ def listAllBooka():
 
 @app.route('/showBookForm')
 def show_Book_Form():
-    return redirect("static/showBookTemplate.xhtml" )
+    return redirect("static/showBook.xhtml" )
 
 @app.route('/showBook', methods=['GET'])
 def show_Book():
     if request.method == "GET":
        id =request.args.get('id')
+
 
     book = db.showBook(int(id))
 
@@ -131,7 +132,8 @@ def API_listBooksAuthor():
 def API_showbook():
     
     content = request.json
-    book_id = content['BookID']
+    book_id = content["BookID"]
+    print(book_id)
     book = db.showBook(book_id)
     nl = book.toDict() 
 
@@ -170,6 +172,7 @@ def f_like(id):
     nlikes=db.likeBook(id)
     book= db.showBook(id)
     return jsonify({"likes": nl})
+
 
 
 if __name__ == '__main__':
