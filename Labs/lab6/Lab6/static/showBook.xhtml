@@ -51,9 +51,24 @@
                 contentType: "application/json",
                 data: '{"BookID":"' + $("#searchText").val() + '"}',
                 success: function (data) {
-                    console.log(data);
-
-                    $("#divDestiny").html(data);
+                        console.log(data);
+                        data = data.replace(/'/g, '"');
+                        var o = JSON.parse(data);
+                        //var obj =JSON.parse(data);
+                        /*s = "<ol>";
+                        for (var i = 0, len = data.length; i < len; i++) {
+                            s += "<li>";
+                            s += data[i];
+                            s += "</li>";
+                        }
+                        s += "</ol>";
+                        $("#divDestiny").html(s);*/
+                        /*$.each(JSON.parse(data), function(index, element) {
+                        $('body').append($('<div>', {
+                         text: element.author
+                          }));
+                    });*/
+                    $("#divDestiny").html(o.author);
                 }
             });
         });
@@ -67,7 +82,7 @@
         <input type="submit" value="Search"  id="ButtonClick"/>
 
     <div id="divDestiny">(this is where the text will go)</div>
-
+    <div id="divDestiny1"></div>
 
 </body>
 </html>

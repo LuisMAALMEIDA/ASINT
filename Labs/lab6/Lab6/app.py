@@ -134,6 +134,7 @@ def API_showbook():
     content = request.json
     book_id = content["BookID"]
     print(book_id)
+    book_id= int(book_id)
     book = db.showBook(book_id)
     nl = book.toDict() 
 

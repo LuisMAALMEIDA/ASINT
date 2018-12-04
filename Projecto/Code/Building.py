@@ -5,3 +5,6 @@ class Building:
 		self.latitude = latitude
 		self.longitude = longitude
 		self.radius = radius
+
+	def toDict(self):
+		return {"BuildingID": self.id, "Name": self.name, "Latitude": self.latitude, "Longitude": self.longitude, "Radius": self.radius}

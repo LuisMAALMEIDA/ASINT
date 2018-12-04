@@ -4,11 +4,12 @@ from flask import request
 from flask import jsonify
 from flask import redirect
 from Building import Building
+from User import User
 
 app = Flask(__name__)
-buildings =  Building()
-storage = Storage()
-logs = Logs()
+buildings =  []
+storage = []
+logs = []
 
 def AuthenticateAdmin(username, password):
     if username == "admin" and password == "123":
@@ -23,37 +24,47 @@ def AuthenticateAdmin(username, password):
 @app.route('/API/Admin/CreateBuilding')
 def CreateBuilding():
     # TODO
-    return render_template("mainPage.html", count_books=count)
+    # Takes the values of json keys
+    content = request.json
+    id = content['ID']
+    name = content['Name']
+    latitude = content['Latitude']
+    longitude = content['Longitude']
+    radius = content['Radius']
+    # Add the building to the vector of buildings
+    b1= Building( id, name, latitude, longitude, radius)
+    buildings.append(b1)
 
 # List all buildings on the server
 @app.route('/API/Admin/ListBuildings')
 def ListBuildings():
     # TODO
-    return render_template("mainPage.html", count_books=count)
+    nl = list(map(lambda x: x.toDict(), buildings) )
+    return jsonify(str(nl))
 
 # List all users on the server
 @app.route('/API/Admin/ListUsers')
 def ListLoggedUsers():
     # TODO
-    return render_template("mainPage.html", count_books=count)
+
 
 # List all users in a building on the server
 @app.route('/API/Admin/ListUsers/<BuidingID>')
 def ListLoggedUsers(BuidingID):
     # TODO
-    return render_template("mainPage.html", count_books=count)
+
 
 # List all the logs from a specified user
-@app.route('/API/Admin/Logs/<User>')
+@app.route('/API/Admin/Logs/User/<User>')
 def ListLoggedUsers(User):
     # TODO
-    return render_template("mainPage.html", count_books=count)
+   
 
 # List all the logs from a specified buiding
-@app.route('/API/Admin/Logs/<BuidingID>')
+@app.route('/API/Admin/Logs/BuildingID/<BuidingID>')
 def ListLoggedUsers(BuidingID):
     # TODO
-    return render_template("mainPage.html", count_books=count)
+
 
 
 

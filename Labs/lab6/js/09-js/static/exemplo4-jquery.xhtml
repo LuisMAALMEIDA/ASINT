@@ -29,13 +29,13 @@
                     data: '{"str":"' + $("#searchText").val() + '"}',
                     success: function (data) {
                         console.log(data);
-                        s = "<ol>";
+                        /*s = "<ol>";
                         for (var i = 0, len = data.length; i < len; i++) {
                             s += "<li>";
                             s += data[i];
                             s += "</li>";
                         }
-                        s += "</ol>";
+                        s += "</ol>";*/
                         $("#divDestiny").html(s);
                     }
                 })
@@ -66,12 +66,13 @@
                     }
                     s += "</ol>";
                     $("#divDestiny").html(s);
+                   
                 }
             });
         });
     });
         //]]>
-</script>
+</script> 
 
    <h1>Input a search term</h1>
 
