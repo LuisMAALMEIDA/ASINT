@@ -8,7 +8,7 @@ from User import User
 
 app = Flask(__name__)
 buildings =  []
-storage = []
+users = []
 logs = []
 
 def AuthenticateAdmin(username, password):
@@ -42,28 +42,34 @@ def ListBuildings():
     nl = list(map(lambda x: x.toDict(), buildings) )
     return jsonify(str(nl))
 
-# List all users on the server
+# List all users logged in on the server
 @app.route('/API/Admin/ListUsers')
 def ListLoggedUsers():
     # TODO
-
+    #Filter the users that are logged-in
+    usersLoggedIn = list(filter(lambda x: x.LoggedIN(), users))
+    nl = list(map(lambda x: x.toDict(), usersLoggedIn) )
+    return jsonify(str(nl))
 
 # List all users in a building on the server
 @app.route('/API/Admin/ListUsers/<BuidingID>')
-def ListLoggedUsers(BuidingID):
+def ListLoggedUsersB(BuidingID):
     # TODO
+    pass
 
 
 # List all the logs from a specified user
 @app.route('/API/Admin/Logs/User/<User>')
-def ListLoggedUsers(User):
+def ListLoggsUsers(User):
     # TODO
+    pass
    
 
 # List all the logs from a specified buiding
 @app.route('/API/Admin/Logs/BuildingID/<BuidingID>')
-def ListLoggedUsers(BuidingID):
+def ListLoggsBuildings(BuidingID):
     # TODO
+    pass
 
 
 
@@ -72,8 +78,8 @@ def ListLoggedUsers(BuidingID):
 ###################################################
 @app.route('/')
 def hello_world():
-    count = len(db.listAllBooks())
-    return render_template("mainPage.html", count_books=count)
+    UsrID=81232
+    return render_template("mainPage.html", UserID=UsrID)
 
 # Authenticate the user
 @app.route('/API/Users/FenixAuthentication')
@@ -96,8 +102,20 @@ def SendMessageToNearbyUsers(UserId):
 # Define the range that will include the nearby users
 @app.route('/API/Users/DefineRange/<UserId>')
 def DefineRange(UserId):
-    # TODO
-    return render_template("mainPage.html", count_books=count)       
+    return render_template("DefineRange.html", UserId = UserId)     
+
+# Update the range of the user
+@app.route('/API/Users/SubmitRange/<UserId>', , methods=['POST'])
+def SubmitDefineRange(UserId):
+
+    # Retrive the range from the webpage
+    range= request.form.get('Range')
+    for user in users:
+        if(user.istid == UserId ):
+            user.DefineRange(range)
+            break
+
+    return render_template("mainPage.html")  
 
 # List the nearby useres: on the range of the messages and on
 # the same building
@@ -117,7 +135,7 @@ def ReceiveMessages(UserId):
 
 # Sends messages to the user from a given bot in a certain building 
 @app.route('/API/Bots/SendMessages/<BuildingId>')
-def ReceiveMessages(BuildingId):
+def BotSendMessages(BuildingId):
     # TODO
     return render_template("mainPage.html", count_books=count) 
 

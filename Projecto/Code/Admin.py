@@ -9,8 +9,8 @@ def DefineBuilding():
     l = input('Insert the id, name, latitude, longitude and radius separated by # :\n')
     # pline -> processed line
     pline = l.split('#')
-    if len(processed_line) ==5:
-        print ('%s %s %s'% (processed_line[0], processed_line[1], processed_line[2]))
+    if len(pline) ==5:
+        print ('%s %s %s'% (pline[0], pline[1], pline[2]))
         payload = {'ID': pline[0] , 'Name': pline[1] , 'Latitude':pline[2], 'Longitude': pline[3], 'Radius': pline[4] }
         r = requests.post("http://127.0.0.1:5000/API/Admin/CreateBuilding", json=payload)
     else:
