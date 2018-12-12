@@ -79,13 +79,16 @@ def ListLoggsBuildings(BuidingID):
 @app.route('/')
 def hello_world():
     UsrID=81232
-    return render_template("mainPage.html", UserID=UsrID)
+    return redirect("static/mainPage.xhtml")
 
 # Authenticate the user
-@app.route('/API/Users/FenixAuthentication')
+@app.route('/API/Users/FenixAuthentication', methods = ['GET'])
 def FenixAuthentication():
     # TODO
-    return render_template("mainPage.html", count_books=count)
+    print("hello")
+    code = request.args.get('code')
+    print(code)
+    return redirect("static/mainPage.xhtml")
 
 # Logout the user
 @app.route('/API/Users/Logout')
@@ -93,42 +96,61 @@ def Logout():
     # TODO
     return render_template("mainPage.html", count_books=count)    
 
+
 # Send messages to users nearby the User (UserId) who request this servive 
-@app.route('/API/Users/SendMessage/<UserId>')
+@app.route('/API/Users/SendMessage/<UserId>', methods=['POST'])
 def SendMessageToNearbyUsers(UserId):
-    # TODO
-    return render_template("mainPage.html", count_books=count)
+    content = request.json
+    message = content['Message']
+    print(message)
+    print(UserId)
+    # TODO  Send message to everyone that is one user range
+    return jsonify("Message sent")
+ 
 
 # Define the range that will include the nearby users
-@app.route('/API/Users/DefineRange/<UserId>')
+@app.route('/API/Users/DefineRange/<UserId>', methods = ['POST'])
 def DefineRange(UserId):
-    return render_template("DefineRange.html", UserId = UserId)     
 
-# Update the range of the user
-@app.route('/API/Users/SubmitRange/<UserId>', , methods=['POST'])
-def SubmitDefineRange(UserId):
-
-    # Retrive the range from the webpage
-    range= request.form.get('Range')
-    for user in users:
+    # TODO   
+    # Retrive the range from the webpage in meters
+    content = request.json
+    range = content['Range']
+    print (range)
+    '''for user in users:
         if(user.istid == UserId ):
             user.DefineRange(range)
-            break
+            break'''
 
-    return render_template("mainPage.html")  
+    return jsonify("Range defined for"+ str(range) +" meters")
 
 # List the nearby useres: on the range of the messages and on
 # the same building
 @app.route('/API/Users/NearbyUsers/<UserId>')
 def ListNearbyUsers(UserId):
     # TODO
-    return render_template("mainPage.html", count_books=count) 
+    # Dummies values
+    users.append(User(81232, "luisalmeida", 5))
+    users.append(User(81108, "diogonunes", 5))
+    NearbyUsers = list(map(lambda x: x.toDict(), users) )
+    print (NearbyUsers)
+    return jsonify(NearbyUsers)
 
 #Send the messages to the user sent by other users and bots
 @app.route('/API/Users/ReceiveMessages/<UserId>')
 def ReceiveMessages(UserId):
     # TODO
-    return render_template("mainPage.html", count_books=count) 
+    messages = []
+    messages.append({"Message": "something beautifull"})
+    messages.append({"Message": "something ugly"})
+    msg= list(messages)
+    return jsonify(msg) 
+
+# Update location of the user
+@app.route('/API/Users/UpdatePosition/<UserId>')
+def UpdatePosition(UserId):
+    # TODO
+    return "xxx"
 
 ############### Bots endpoints ####################
 ###################################################

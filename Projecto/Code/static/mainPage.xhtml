@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Ist Messages App</title>
+    <style type="text/css">
+
+    </style>
+   <link rel="stylesheet" href="jquery-ui.css"> </link>
+    <script src="jquery.js"></script>
+     <script src="jquery-ui.js"></script>
+
+</head>
+<body>
+
+    <p><button onclick="geoFindMe()">Show my location</button></p>
+    <div id="out"></div>    
+
+<script>
+       //<![CDATA[
+    var istid = "81232"
+
+   function geoFindMe() {
+  var output = document.getElementById("out");
+
+  if (!navigator.geolocation){
+    output.innerHTML = "<p>Geolocation is not supported by your browser</p>";
+    return;
+  }
+
+  function success(position) {
+    var latitude  = position.coords.latitude;
+    var longitude = position.coords.longitude;
+
+    output.innerHTML = '<p>Latitude is ' + latitude + '° <br>Longitude is ' + longitude + '°</p>';
+
+    var img = new Image();
+    img.src = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=13&size=300x300&sensor=false";
+
+    output.appendChild(img);
+  }
+
+  function error() {
+    output.innerHTML = "Unable to retrieve your location";
+  }
+
+  output.innerHTML = "<p>Locating…</p>";
+
+  navigator.geolocation.getCurrentPosition(success, error);
+}
+
+    $( document ).ready(function() {
+        /*
+        $("#Login").click(
+            function(event){
+                $.ajax({
+                    type: "POST",
+                    url: "https://fenix.tecnico.ulisboa.pt/oauth/userdialog?client_id=<851490151333940>&redirect_uri=</API/Users/FenixAuthentication>",
+
+
+                })
+
+
+            }
+
+        )*/
+
+
+        
+
+
+
+
+        // Sends message
+        $("#Sendmessage").click(
+            function(event){
+                $.ajax({
+                    type: "POST",
+                    url: "/API/Users/SendMessage/"+istid,
+                    datatype: "json",
+                    contentType: "application/json",
+                    data: '{"Message":"' + $("#TextMessage").val() + '"}',
+                    success: function (data) {
+
+                        $("#divRange").show(1000).html(data).hide(10000);
+                    }
+                })
+
+
+            }
+
+        )
+
+        // Define range
+        $("#DefRange").click(
+            function(event){
+                $.ajax({
+                    type: "POST",
+                    url: "/API/Users/DefineRange/"+istid,
+                    datatype: "json",
+                    contentType: "application/json",
+                    data: '{"Range":"' + $("#TextRange").val() + '"}',
+                    success: function (data) {
+
+                        $("#divRange").show(1000).html(data).hide(10000);                        
+                    }
+                })
+
+            }
+
+        )
+
+        // Print on screen the neaby users
+        $( "#NearbyUsers" ).click(function( event ) {
+            console.log("click");
+            $("#divNearbyUsers").html("waiting");
+            $.ajax({
+                type: "GET",
+                url: "/API/Users/NearbyUsers/" + istid,
+                dataType: "json",
+                cache: false,
+                contentType: "application/json",
+                success: function (users) {
+                    console.log(users);
+                    s = "<ol>"
+                    $.each(users, function(index, user) {
+                        s += "<li>";
+                        s += "ISTID: " + user.IstID + ", Name: " + user.Name;
+                        s += "</li>";
+                    });
+                    s += "</ol>";
+                    $("#divNearbyUsers").show(10).html(s).delay(10000).hide(1000);
+                   
+                }
+            });
+        });
+
+        // Print on screen the messages received
+        $( "#RecvdMessage" ).click(function( event ) {
+            console.log("click");
+            $("#divRecvMessages").html("waiting");
+            $.ajax({
+                type: "GET",
+                url: "/API/Users/ReceiveMessages/" + istid,
+                dataType: "json",
+                cache: false,
+                contentType: "application/json",
+                success: function (array_msg) {
+                    console.log(array_msg);
+                    s = "<ol>";
+                    $.each(array_msg, function(index, msg) {
+                        s += "<li>";
+                        s += "Message: " + msg.Message;
+                        s += "</li>";
+                    });
+                    s += "</ol>";
+                    $("#divRecvMessages").show(10).html(s).delay(10000).hide(1000);
+                   
+                }
+            });
+        });
+
+
+    });
+        //]]>
+</script> 
+
+<h1>Welcome to our app!</h1>
+
+<h2>Please try one of the features and enjoy !!! </h2>
+
+    <h3>Login</h3>
+    <input type="submit" value="Login"  id="Login"/>
+
+    <h3>Send a message</h3>
+
+    <input type="text" name="" size="20" id="TextMessage" />
+    <input type="submit" value="Search"  id="Sendmessage"/>
+    <div id="divMessage"></div>
+
+    <h3>Define range in meters</h3>
+
+    <input type="number" name="" size="20" id="TextRange" />
+    <input type="submit" value="Define range"  id="DefRange"/>
+    <div id="divRange"></div>
+
+
+    <h3>Nearby Users</h3>
+
+    <input type="submit" value="Click in me too see nearby users"  id="NearbyUsers"/>
+    <div id="divNearbyUsers"></div>
+
+
+    <h3>Received messages</h3>
+    <input type="submit" value="See received messages"  id="RecvdMessage"/>
+    <div id="divRecvMessages"></div>
+
+
+    <h3>Logout  </h3>
+
+    <input type="submit" value="Logout"  id="Logout"/>
+
+
+
+</body>
+</html>
