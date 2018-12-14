@@ -12,65 +12,64 @@
     <script src="jquery.js"></script>
      <script src="jquery-ui.js"></script>
 
+
+
 </head>
 <body>
 
-    <p><button onclick="geoFindMe()">Show my location</button></p>
+    
     <div id="out"></div>    
 
 <script>
        //<![CDATA[
     var istid = "81232"
 
-   function geoFindMe() {
-  var output = document.getElementById("out");
+    function login() {
+        location.replace("https://fenix.tecnico.ulisboa.pt/oauth/userdialog?client_id=851490151333940&redirect_uri=http://localhost:5000/API/Users/FenixAuthentication")
+    }
 
-  if (!navigator.geolocation){
-    output.innerHTML = "<p>Geolocation is not supported by your browser</p>";
-    return;
-  }
 
-  function success(position) {
-    var latitude  = position.coords.latitude;
-    var longitude = position.coords.longitude;
+    function locate(){
+    
+    
+        setInterval(function geoFindMe() {
+                        var output = document.getElementById("out");
+                        if (!navigator.geolocation){
+                            output.innerHTML = "<p>Geolocation is not supported by your browser</p>";
+                            return;
+                        }
 
-    output.innerHTML = '<p>Latitude is ' + latitude + '° <br>Longitude is ' + longitude + '°</p>';
+                        function success(position) {
+                            var latitude  = position.coords.latitude;
+                            var longitude = position.coords.longitude;
+                            console.log(latitude)
+                            console.log(longitude)
+                            output.innerHTML = '<p>Latitude is ' + latitude + '° Longitude is ' + longitude + '°</p>';
+                            
+                            $.ajax({
+                                type: "POST",
+                                url: "/API/Users/UpdatePosition/"+istid,
+                                datatype: "json",
+                                contentType: "application/json",
+                                data: '{"Latitude":"' + latitude + '", "Longitude":"' + longitude + '"}',
 
-    var img = new Image();
-    img.src = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=13&size=300x300&sensor=false";
+                            })
 
-    output.appendChild(img);
-  }
 
-  function error() {
-    output.innerHTML = "Unable to retrieve your location";
-  }
+                        }
 
-  output.innerHTML = "<p>Locating…</p>";
+                        function error() {
+                            output.innerHTML = "Unable to retrieve your location";
+                        }
 
-  navigator.geolocation.getCurrentPosition(success, error);
-}
+                    output.innerHTML = "<p>Locating…</p>";
+
+                    navigator.geolocation.getCurrentPosition(success, error);
+                    }  , 5000); // 5000 ms (tempo que vai reenviar a localização)
+    }
 
     $( document ).ready(function() {
-        /*
-        $("#Login").click(
-            function(event){
-                $.ajax({
-                    type: "POST",
-                    url: "https://fenix.tecnico.ulisboa.pt/oauth/userdialog?client_id=<851490151333940>&redirect_uri=</API/Users/FenixAuthentication>",
-
-
-                })
-
-
-            }
-
-        )*/
-
-
-        
-
-
+       
 
 
         // Sends message
@@ -171,13 +170,13 @@
 
 <h2>Please try one of the features and enjoy !!! </h2>
 
-    <h3>Login</h3>
-    <input type="submit" value="Login"  id="Login"/>
+    <h3>Login</h3> 
+    <button onclick="login()">Login</button>
 
     <h3>Send a message</h3>
 
     <input type="text" name="" size="20" id="TextMessage" />
-    <input type="submit" value="Search"  id="Sendmessage"/>
+    <input type="submit" value="Send message"  id="Sendmessage"/>
     <div id="divMessage"></div>
 
     <h3>Define range in meters</h3>

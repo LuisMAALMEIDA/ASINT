@@ -11,33 +11,48 @@ def DefineBuilding():
     pline = l.split('#')
     if len(pline) ==5:
         print ('%s %s %s'% (pline[0], pline[1], pline[2]))
+        # Sends the building feature to the server
         payload = {'ID': pline[0] , 'Name': pline[1] , 'Latitude':pline[2], 'Longitude': pline[3], 'Radius': pline[4] }
         r = requests.post("http://127.0.0.1:5000/API/Admin/CreateBuilding", json=payload)
+        data = r.json()
+        json_acceptable_string = data.replace("'", "\"")
+        msg = json.loads(json_acceptable_string)
+        print(msg["Msg"])
     else:
         print('Error in defining a building')
 
 
 
 def ListAllUsersSystem():
-    r = requests.post("http://127.0.0.1:5000/API/Admin/ListBuildings")
+    r = requests.post("http://127.0.0.1:5000/API/Admin/ListUsers")
     data = r.json()
     json_acceptable_string = data.replace("'", "\"")
-    dic_book = json.loads(json_acceptable_string)
-    # TODO ver o que é o print faz, i dont remember
-    print(dic_book)
+    users = json.loads(json_acceptable_string)
+
+    for user in users:
+        if "Name" in user:
+                print("Name:"+user["Name"]+", IstID:" + str(user["IstID"])+", Range:" + str(user["Range"]) )
+        else:
+                # As Name it's not a key from users, then there are no users on the server
+                print("Non user is logged in")
+    
 
 
 
 def ListUsrInBuiliding():
     l = input('Insert a building ID :\n')
-
+    # TODO
     url="http://127.0.0.1:5000/API/Admin/ListUsers/"+l
     r = requests.post(url)
     data = r.json()
     json_acceptable_string = data.replace("'", "\"")
-    dic_book = json.loads(json_acceptable_string)       
-    # TODO ver o que é o print faz, i dont remember
-    print(dic_book)
+    users = json.loads(json_acceptable_string)  
+    for user in users:
+        if "Name" in user:
+                print("Name:"+user["Name"]+", IstID:" + user["IstID"]+", Range:" + user["Range"] )
+        else:
+                print("Non user is the builing in")
+    
 
 
 
