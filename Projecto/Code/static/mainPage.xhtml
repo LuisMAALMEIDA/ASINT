@@ -10,24 +10,51 @@
     </style>
    <link rel="stylesheet" href="jquery-ui.css"> </link>
     <script src="jquery.js"></script>
-     <script src="jquery-ui.js"></script>
-
-
+    <script src="jquery-ui.js"></script> 
 
 </head>
-<body>
-
+<body onload = "displayUserName(); locate();">
+<!--  <body onload = "locate()">   -->
     
-    <div id="out"></div>    
+
 
 <script>
        //<![CDATA[
-    var istid = "81232"
+    var istid = ""
 
     function login() {
         location.replace("https://fenix.tecnico.ulisboa.pt/oauth/userdialog?client_id=851490151333940&redirect_uri=http://localhost:5000/API/Users/FenixAuthentication")
     }
 
+    function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+
+    }
+
+
+    function displayUserName(){
+        var divuser = document.getElementById("divUser");
+        var user = getCookie("name");
+        istid = getCookie("user_id")
+        
+        if (user != "") { // All went well (we have a user)
+            divuser.innerHTML = "<p> Welcome: "+ user + "</p>"
+        } else {
+            divuser.innerHTML = '<p> Please loggin to have fun </p>'
+        }
+    }
 
     function locate(){
     
@@ -65,7 +92,7 @@
                     output.innerHTML = "<p>Locating…</p>";
 
                     navigator.geolocation.getCurrentPosition(success, error);
-                    }  , 5000); // 5000 ms (tempo que vai reenviar a localização)
+                    }  , 60000); // 60000 ms (tempo que vai reenviar a localização)
     }
 
     $( document ).ready(function() {
@@ -83,7 +110,7 @@
                     data: '{"Message":"' + $("#TextMessage").val() + '"}',
                     success: function (data) {
 
-                        $("#divRange").show(1000).html(data).hide(10000);
+                        $("#divMessage").show(1000).html(data).hide(10000);
                     }
                 })
 
@@ -169,6 +196,9 @@
 <h1>Welcome to our app!</h1>
 
 <h2>Please try one of the features and enjoy !!! </h2>
+
+    <div id="divUser"></div>  <!-- Shows the user name or Please loggin to have fun -->
+    <div id="out"></div>    
 
     <h3>Login</h3> 
     <button onclick="login()">Login</button>
