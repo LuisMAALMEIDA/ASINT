@@ -21,6 +21,15 @@ def DefineBuilding():
     else:
         print('Error in defining a building')
 
+def CreateBot():
+    l = input('Insert the ID of the building of the bot: ')
+    payload = {'Building_ID' : l}
+    r = requests.post("http://127.0.0.1:5000/API/Admin/CreateBot", json=payload)
+
+    data = r.json()
+    json_acceptable_string = data.replace("'", "\"")
+    msg = json.loads(json_acceptable_string)
+    print(msg["Msg"])
 
 
 def ListAllUsersSystem():
@@ -35,7 +44,7 @@ def ListAllUsersSystem():
         else:
                 # As Name it's not a key from users, then there are no users on the server
                 print("Non user is logged in")
-    
+
 
 
 
@@ -46,13 +55,13 @@ def ListUsrInBuiliding():
     r = requests.post(url)
     data = r.json()
     json_acceptable_string = data.replace("'", "\"")
-    users = json.loads(json_acceptable_string)  
+    users = json.loads(json_acceptable_string)
     for user in users:
         if "Name" in user:
                 print("Name:"+user["Name"]+", IstID:" + user["IstID"]+", Range:" + user["Range"] )
         else:
                 print("Non user is the builing in")
-    
+
 
 
 
@@ -64,7 +73,7 @@ def HistoryUsers():
     r = requests.post(url)
     data = r.json()
     json_acceptable_string = data.replace("'", "\"")
-    dic_book = json.loads(json_acceptable_string)       
+    dic_book = json.loads(json_acceptable_string)
     # TODO ver o que é o print faz, i dont remember
     print(dic_book)
 
@@ -77,7 +86,7 @@ def HistoryBuilding():
     r = requests.post(url)
     data = r.json()
     json_acceptable_string = data.replace("'", "\"")
-    dic_book = json.loads(json_acceptable_string)       
+    dic_book = json.loads(json_acceptable_string)
     # TODO ver o que é o print faz, i dont remember
     print(dic_book)
 
@@ -85,7 +94,7 @@ def HistoryBuilding():
 
 
 def main():
-            
+
     exit = False
     while not exit:
         print('Menu:')
@@ -98,9 +107,9 @@ def main():
         l = l.split()
 
         if len(l)==1:
-                
+
                 command = ''.join(l)
-                
+
                 #Quit
                 if command=='6':
                         exit = True
@@ -117,10 +126,12 @@ def main():
                         ListUsrInBuiliding()
 
                 elif command == '4':
-                        HistoryUsers()       
+                        HistoryUsers()
                 elif command == '5':
                         HistoryBuilding()
-        
+                elif command == '7':
+                        CreateBot()
+
 
 
 
@@ -128,4 +139,4 @@ def main():
 
 
 if __name__=="__main__":
-        main() 
+        main()

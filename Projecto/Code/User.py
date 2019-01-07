@@ -12,7 +12,7 @@ class User:
 
     def toDict(self):
         return {"IstID":self.istid,"Name": self.name,  "Range": self.range}
-    
+
     # Verify if the user is logger in
     def LoggedIN(self):
         if(self.LoggedIn == True):
@@ -50,18 +50,8 @@ class User:
 
         distance = R * c # in Km
         distanceInMeters = distance*1000 # in meters  
-        print(self.istid)
-        print(self.latitude)
-        print(self.longitude)
-        print("range") 
-        print(X_range)
-        print("distancia")
-        print(distanceInMeters)
-        print("\n\n")
 
         if (float(X_range) - float(distanceInMeters)  >= 0 ):
             return True
         else:
             return False
-        
-

@@ -4,14 +4,16 @@ from flask import request
 from flask import jsonify
 from flask import redirect
 from flask import make_response
+from flask_pymongo import PyMongo
 from Building import Building
+from Bots import Bot
 from User import User
 import memcache
 import requests
 import pika # Queues from RabbitMQ
 
 from werkzeug.contrib.cache import SimpleCache # Import cache for the access_token
-c = SimpleCache()       
+c = SimpleCache()
 
 # Establish a connection with RabbitMQ server
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
@@ -19,18 +21,27 @@ channel = connection.channel()
 
 app = Flask(__name__)
 
+app.config['MONGO_DBNAME'] = 'asintdb'
+app.config['MONGO_URI'] = 'mongodb://diogo:asint16@ds149744.mlab.com:49744/asintdb'
+
+mongo = PyMongo(app)
+
 messages = []
 buildings =  []
 users = []
 logs = []
+bots = []
 
 # PARA ELIMINAR (SO PARA TESTAR)
 u = User("ist181882", "Juliaqueen", 8)
-u.latitude = 39.236668699999996
-u.longitude = -8.6859944
+u.latitude = 39.265033599999
+u.longitude = -9.1629944
 users.append(u)
 messages.append(u)
 channel.queue_declare(queue = "ist181882")
+
+b_ = Building(1, "Casa", 39.2650752, -9.162752, 1000)
+buildings.append(b_)
 #############################################
 
 def AuthenticateAdmin(username, password):
@@ -38,6 +49,14 @@ def AuthenticateAdmin(username, password):
         return True
     else:
         return False
+
+def insertMsg(sender, receiver, message):
+    msg = mongo.db.messages
+    msg.insert_one({"Sender" : sender, "Receiver" : receiver, "Message" : message})
+
+def insertMove(userid, la, lo):
+    move = mongo.db.moves
+    move.insert_one({"User" : userid, "Latitude" : la, "Longitude" : lo})
 
 ############### Admin endpoints ###############
 ###############################################
@@ -62,9 +81,29 @@ def CreateBuilding():
     b1= Building( id, name, latitude, longitude, radius)
     buildings.append(b1)
 
-    
+
 
     return jsonify(str({"Msg" : "Builing created"}))
+
+@app.route('/API/Admin/CreateBot', methods=['POST'])
+def CreateBot():
+        content = request.json
+        building_id = content["Building_ID"]
+        building_id = int(building_id)
+        match=0
+        for build in buildings:
+            if building_id == build.id:
+                match = 1
+                bot_id = 'bot' + str(len(bots)+1)    #TODO gerar uma chave melhor para cada bot em vez de ser simplesmente o numero de bots que existe +1
+                bt = Bot(bot_id, building_id)
+                bots.append(bt)
+                print("Room for a bot created with id {} for building with id {}".format(bot_id, building_id))
+                break
+
+        if match==0:
+            return jsonify(str({"Msg": "No building with that id"}))
+        else:
+            return jsonify(str({"Msg" : bot_id}))
 
 # List all buildings on the server
 @app.route('/API/Admin/ListBuildings')
@@ -99,7 +138,7 @@ def ListLoggedUsersB(BuidingID):
 def ListLoggsUsers(User):
     # TODO
     pass
-   
+
 
 # List all the logs from a specified buiding
 @app.route('/API/Admin/Logs/BuildingID/<BuidingID>')
@@ -123,10 +162,10 @@ def FenixAuthentication():
     # TODO
     if request.method == "GET":
         # Gets the code in order to get user information
-        code = request.args.get('code') 
+        code = request.args.get('code')
         print(code)
         url = "https://fenix.tecnico.ulisboa.pt/oauth/access_token?"
-        json_obj = {"client_id":"851490151333940", 
+        json_obj = {"client_id":"851490151333940",
                     "client_secret": "pB3+ic918UJStPLEjgSEHpjRkV0ETU3fJzr08+i/KUe/tmy0WgH7nl5/Pxw+wflynpf8KL36snP4C5gtoPLoKA==",
                     "redirect_uri" : "http://localhost:5000/API/Users/FenixAuthentication",
                     "code": code, "grant_type":"authorization_code" }
@@ -138,8 +177,8 @@ def FenixAuthentication():
         # Get the user's information with a get request
         at = { "access_token": access_token}
         r_user = requests.get('https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person', params=at)
-        user_name = r_user.json()['name']  
-        user_istid = r_user.json()['username'] 
+        user_name = r_user.json()['name']
+        user_istid = r_user.json()['username']
         print( user_name)
         user = User(user_istid, user_name, 0 )
         users.append(user)
@@ -152,17 +191,17 @@ def FenixAuthentication():
         response.set_cookie('user_id', value = user_istid , max_age=3600 )
         response.set_cookie('access_token', value=access_token, max_age=3600 )
         response.set_cookie('name', value=user_name, max_age=3600 )
-        
+
         # Set cache for the server
-        
+
         c.set(user_istid, access_token, timeout=3600)
         key= c.get(user_istid)
         print(key)
-        
+
         # TODO ISTO È PARA POR NA BASE DE DADOS (que são os users)
         if(not(any(user.istid == user_istid for user in users))):
                 U = User(user_istid, user_name, 0)
-                users.append(U)                
+                users.append(U)
 
 
         # Create message queues for each user (i.e when the user does login)
@@ -177,10 +216,10 @@ def FenixAuthentication():
 @app.route('/API/Users/Logout')
 def Logout():
     # TODO
-    return render_template("mainPage.html")    
+    return render_template("mainPage.html")
 
 
-# Send messages to users nearby the User (UserId) who request this servive 
+# Send messages to users nearby the User (UserId) who request this servive
 @app.route('/API/Users/SendMessage/<UserId>', methods=['POST'])
 def SendMessageToNearbyUsers(UserId):
     content = request.json
@@ -202,17 +241,15 @@ def SendMessageToNearbyUsers(UserId):
 
     # Put the message in the users' "mail box" queue message
     for user in usersInRange1:
-        print("HELLO MODAFUCKER")
         print(str(user.istid))
         print(message)
+        insertMsg(sendingUser.istid, user.istid, message)
         channel.basic_publish(exchange='',
                       routing_key=str(user.istid),
                       body=message)
 
-
-
     return jsonify("Message sent")
- 
+
 
 # Define the range that will include the nearby users
 @app.route('/API/Users/DefineRange/<UserId>', methods = ['POST'])
@@ -273,15 +310,15 @@ def ReceiveMessages(UserId):
     while(not(queue_empty)):
         queue_state = channel.queue_declare(queue=UserId, durable=True, passive=True)
         queue_empty = queue_state.method.message_count == 0
-	
+
         if not queue_empty:
-                method, properties, body = channel.basic_get(queue=UserId, no_ack=True)  
+                method, properties, body = channel.basic_get(queue=UserId, no_ack=True)
                 messages.append({"Message" : body.decode('UTF-8')})
                 print(body.decode('UTF-8'))
-    
+
     print(messages)
     msg= list(messages)
-    return jsonify(msg) 
+    return jsonify(msg)
 
 # Update location of the user
 @app.route('/API/Users/UpdatePosition/<UserId>', methods = ['POST'] )
@@ -295,7 +332,7 @@ def UpdatePosition(UserId):
                 Longitude = content['Longitude']
                 user.latitude = float(Latitude)
                 user.longitude = float(Longitude)
-
+                insertMove(user.istid, user.latitude, user.longitude)
 
     # TODO Falta fazer a cena dos logs, isto é comparar se o user está a entrar
     # num building ou a  sair
@@ -305,11 +342,37 @@ def UpdatePosition(UserId):
 ############### Bots endpoints ####################
 ###################################################
 
-# Sends messages to the user from a given bot in a certain building 
-@app.route('/API/Bots/SendMessages/<BuildingId>')
-def BotSendMessages(BuildingId):
-    # TODO
-    return render_template("mainPage.html") 
+# Sends messages to the user from a given bot in a certain building
+@app.route('/API/Bots/SendMessages', methods=['POST'])
+def BotSendMessages():
+    content = request.json
+    botID = content["ID"]
+    message = content["Message"]
+
+    match = 0
+    for bot in bots:
+        if bot.id == botID:
+            match = 1
+            building_id = bot.building_id
+    if match==0:
+        return jsonify(str({"Status":"Error"}))
+
+    for build in buildings:
+        if building_id == build.id:
+            la = float(build.latitude)
+            lo = float(build.longitude)
+            r = float(build.radius)
+            break
+
+    UserinBuilding = list(filter(lambda x: x.InRangeOfAnotherUser(la, lo, r), users))
+
+    for user in UserinBuilding:
+        insertMsg(botID, user.istid, message)
+        channel.basic_publish(exchange='',
+                      routing_key=str(user.istid),
+                      body=message)
+
+    return jsonify(str({"Status":"OK"}))
 
 
 if __name__ == '__main__':
