@@ -188,6 +188,23 @@
             });
         });
 
+        $("#Logout").click(
+            function(event){
+                $.ajax({
+                    type: "POST",
+                    url: "/API/Users/Logout/"+istid,
+                    datatype: "json",
+                    contentType: "application/json",
+                    data: '{"Logout":"True"}',
+                    success: function (data) {
+
+                        $("#divRange").show(1000).html(data).hide(10000);                        
+                    }
+                })
+
+            }
+
+        )
 
     });
         //]]>
